@@ -1,0 +1,18 @@
+configuration{
+    modi: "run,window,drun,combi";
+    icon-theme: "Oranchelo";
+    show-icons: true;
+    combi-modi: [run, window, drun];
+    terminal: "alacritty";
+    drun-display-format: "{icon} {name}";
+    location: 0;
+    disable-history: false;
+    hide-scrollbar: true;
+    display-combi: " All ";
+    display-run: " Run ";
+    display-drun: " Drun ";
+    display-window: " Window ";
+    sidebar-mode: true;
+}
+
+@theme "catppuccin-mocha"

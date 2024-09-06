@@ -1,3 +1,10 @@
+local function which_python()
+    local f = io.popen('env which python', 'r') or error("Fail to execute 'env which python'")
+    local s = f:read('*a') or error("Fail to read from io.popen result")
+    f:close()
+    return string.gsub(s, '%s+$', '')
+end
+
 return {
     {
         'VonHeikemen/lsp-zero.nvim',
@@ -92,6 +99,17 @@ return {
                     function(server_name)
                         require('lspconfig')[server_name].setup({})
                     end,
+                    pylsp = function()
+                        require('lspconfig').pylsp.setup({
+                            settings = {
+                                pylsp = {
+                                    plugins = {
+                                        jedi = { environment = which_python() },
+                                    }
+                                }
+                            }
+                        })
+                    end
                 }
             })
 

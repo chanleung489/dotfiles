@@ -19,7 +19,20 @@ return {
         end,
     },
 
-    { "nvim-treesitter/nvim-treesitter", run = "TSUpdate" },
+    {
+        "nvim-treesitter/nvim-treesitter",
+        run = "TSUpdate",
+        config = function ()
+            require("nvim-treesitter.configs").setup({
+                highlight = {
+                    enable = true,
+                },
+                indent = {
+                    enable = true,
+                },
+            })
+        end
+    },
 
     {
         "nvim-telescope/telescope.nvim",
@@ -34,7 +47,12 @@ return {
         end
     },
 
-    "mbbill/undotree",
+    {
+        "mbbill/undotree",
+        config = function()
+            vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
+        end
+    },
 
     {
         "lukas-reineke/indent-blankline.nvim",

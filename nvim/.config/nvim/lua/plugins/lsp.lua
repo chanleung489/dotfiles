@@ -91,33 +91,35 @@ return {
                 capabilities = require('cmp_nvim_lsp').default_capabilities()
             })
 
-            require('mason-lspconfig').setup({
-                ensure_installed = { 'lua_ls' },
-                handlers = {
-                    -- this first function is the "default handler"
-                    -- it applies to every language server without a "custom handler"
-                    function(server_name)
-                        require('lspconfig')[server_name].setup({})
-                    end,
-                    pylsp = function()
+            local handlers = {
+                -- this first function is the "default handler"
+                -- it applies to every language server without a "custom handler"
+                function(server_name)
+                    require('lspconfig')[server_name].setup({})
+                end,
+            }
+            local python = which_python()
+            if python ~= "" then
+                handlers["pylsp"] = {
+                    function()
                         require('lspconfig').pylsp.setup({
                             settings = {
                                 pylsp = {
                                     plugins = {
-                                        jedi = { environment = which_python() },
+                                        jedi = { environment = python },
                                     }
                                 }
                             }
                         })
                     end
                 }
-            })
-
-            local signs = { Error = "󰅚 ", Warn = "󰀪 ", Hint = "󰌶 ", Info = " " }
-            for type, icon in pairs(signs) do
-                local hl = "DiagnosticSign" .. type
-                vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
             end
+            require('mason-lspconfig').setup({
+                ensure_installed = {
+                    'lua_ls',
+                },
+                handlers = handlers
+            })
 
             vim.diagnostic.config({
                 virtual_text = {

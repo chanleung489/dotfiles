@@ -37,6 +37,17 @@ vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]]) -- replace all instance in buffer
+local cword = vim.fn.expand("<cword>")
+vim.keymap.set("n", "<leader>aps", function()
+    vim.ui.input(
+        { prompt = "Prefix: " },
+        function(user_input)
+            vim.cmd([[%s/\<]] .. cword .. [[\>/]] .. user_input .. cword .. [[/gI]])
+        end
+    )
+end) -- add prefix (prompt) to all instance in buffer
+vim.keymap.set("n", "<leader>as", [[:%s/\<<C-r><C-w>\>/prefix.<C-r><C-w>/gI<CR>]]) -- add prefix (prompt) to all instance in buffer
+
 -- vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true }) -- turn bash into executable
 
 -- vim.keymap.set("n", "<leader>vpp", "<cmd>e ~/.config/nvim/lua/user/packer.lua<CR>");

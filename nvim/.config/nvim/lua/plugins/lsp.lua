@@ -97,6 +97,11 @@ return {
                 function(server_name)
                     require('lspconfig')[server_name].setup({})
                 end,
+                lua_ls = function()
+                    require('lspconfig').lua_ls.setup({
+                        settings = { Lua = { diagnostics = { globals = { 'vim' } } } }
+                    })
+                end,
             }
             local python = which_python()
             if python ~= "" then

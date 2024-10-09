@@ -24,10 +24,13 @@ return {
         event = 'InsertEnter',
         dependencies = {
             { 'L3MON4D3/LuaSnip' },
+            { 'rafamadriz/friendly-snippets' },
+            { 'saadparwaiz1/cmp_luasnip' },
         },
         config = function()
             local cmp = require('cmp')
             local cmp_select = { behaviour = 'select' }
+            require("luasnip.loaders.from_vscode").lazy_load()
 
             cmp.setup({
                 sources = {
@@ -48,6 +51,7 @@ return {
                 }),
                 snippet = {
                     expand = function(args)
+                        require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
                         vim.snippet.expand(args.body)
                     end,
                 },

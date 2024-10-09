@@ -37,11 +37,11 @@ vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]]) -- replace all instance in buffer
-local cword = vim.fn.expand("<cword>")
 vim.keymap.set("n", "<leader>aps", function()
     vim.ui.input(
         { prompt = "Prefix: " },
         function(user_input)
+            local cword = vim.fn.expand("<cword>")
             vim.cmd([[%s/\<]] .. cword .. [[\>/]] .. user_input .. cword .. [[/gI]])
         end
     )

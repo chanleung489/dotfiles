@@ -26,8 +26,6 @@ vim.keymap.set({ "n", "v" }, "<leader>pp", [["+p]])
 -- delete into void
 vim.keymap.set({ "n", "v" }, "<leader>d", [["_d]])
 
--- vim.keymap.set("i", "<C-c>", "<Esc>")
-
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
 
 -- quick fix action list
@@ -50,9 +48,6 @@ vim.keymap.set("n", "<leader>is", [[:%s/\<<C-r><C-w>\>/prefix.<C-r><C-w>/gI<CR>]
 
 -- vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true }) -- turn bash into executable
 
--- vim.keymap.set("n", "<leader>vpp", "<cmd>e ~/.config/nvim/lua/user/packer.lua<CR>");
--- vim.keymap.set("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>");
-
 -- tabs
 -- vim.keymap.set("n", "<leader><Tab>n", "<cmd>tabnew<CR>")
 -- vim.keymap.set("n", "<leader><Tab>c", "<cmd>tabclose<CR>")
@@ -61,10 +56,9 @@ vim.keymap.set("n", "<leader>is", [[:%s/\<<C-r><C-w>\>/prefix.<C-r><C-w>/gI<CR>]
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
-vim.keymap.set("n", "<leader>##", "I")
-vim.keymap.set("n", "<leader>#<BS>", "^dw<Esc>")
-vim.keymap.set("v", "<leader>##", "^<C-v>o^I")
-vim.keymap.set("v", "<leader>#<BS>", "^<C-v>o^f x<Esc>")
-
--- vim.keymap.set("n", "<leader>kmp", "<cmd>e ~/.config/nvim/lua/user/remap.lua<CR>");
--- vim.keymap.set("n", "<leader>vcf", "<cmd>tcd ~/.config/nvim<CR>");
+-- brackets around selection
+vim.keymap.set("v", "<leader>a(", [[<Esc>`>a)<Esc>`<i(<Esc>]])
+vim.keymap.set("v", "<leader>a[", [[<Esc>`>a]<Esc>`<i[<Esc>]])
+vim.keymap.set("v", "<leader>a{", [[<Esc>`>a}<Esc>`<i{<Esc>]])
+vim.keymap.set("v", "<leader>a<", [[<Esc>`>a><Esc>`<i<<Esc>]])
+vim.keymap.set("v", "<leader>a\"", [[<Esc>`>a"<Esc>`<i"<Esc>]])

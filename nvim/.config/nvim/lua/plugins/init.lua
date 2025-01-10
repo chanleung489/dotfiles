@@ -30,23 +30,23 @@ return {
             })
             vim.cmd.colorscheme("catppuccin")
             local mocha = require("catppuccin.palettes").get_palette("mocha")
-            vim.api.nvim_set_hl(0, "LineNr", { fg=mocha["overlay2"] })
-            vim.api.nvim_set_hl(0, "LineNrAbove", { fg=mocha["surface2"] })
-            vim.api.nvim_set_hl(0, "LineNrBelow", { fg=mocha["surface2"] })
+            vim.api.nvim_set_hl(0, "LineNr", { fg = mocha["overlay2"] })
+            vim.api.nvim_set_hl(0, "LineNrAbove", { fg = mocha["surface2"] })
+            vim.api.nvim_set_hl(0, "LineNrBelow", { fg = mocha["surface2"] })
         end,
     },
 
     {
         "nvim-treesitter/nvim-treesitter",
-        run = "TSUpdate",
+        build = ":TSUpdate",
         config = function()
-            require("nvim-treesitter.configs").setup({
-                highlight = {
-                    enable = true,
-                },
-                indent = {
-                    enable = true,
-                },
+            local configs = require("nvim-treesitter.configs")
+
+            configs.setup({
+                ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "elixir", "heex", "javascript", "html" },
+                sync_install = false,
+                highlight = { enable = true },
+                indent = { enable = true },
             })
         end
     },
@@ -54,8 +54,22 @@ return {
     {
         "nvim-telescope/telescope.nvim",
         tag = "0.1.8",
-        dependencies = { "nvim-lua/plenary.nvim" },
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
+        },
         config = function()
+            -- You dont need to set any of these options. These are the default ones. Only
+            -- the loading is important
+            require('telescope').setup {
+                extensions = {
+                    fzf = {}
+                }
+            }
+            -- To get fzf loaded and working with telescope, you need to call
+            -- load_extension, somewhere after setup function:
+            require('telescope').load_extension('fzf')
+
             local builtin = require("telescope.builtin")
             vim.keymap.set("n", "<leader>pf", builtin.find_files, {})
             vim.keymap.set("n", "<leader>ps", builtin.live_grep, {})
@@ -68,9 +82,9 @@ return {
     {
         "mbbill/undotree",
         config = function()
-            vim.keymap.set("n", "<leader>u", function ()
+            vim.keymap.set("n", "<leader>u", function()
+                vim.g.undotree_SetFocusWhenToggle = 1
                 vim.cmd.UndotreeToggle()
-                vim.cmd([[exe "normal \<c-w>\<c-w>"]])
             end
             )
         end

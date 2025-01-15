@@ -119,18 +119,15 @@
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
-    neovim
     alacritty
-    git
     librewolf-unwrapped
     stow
     feh
     rofi
     polybar
     picom
-    tmux
-    zoxide
     fzf
+    zoxide
     ripgrep
     lua
     luajitPackages.luarocks_bootstrap
@@ -144,6 +141,17 @@
   programs.neovim = {
     enable = true;
     defaultEditor = true;
+  };
+
+  programs.git = {
+    enable = true;
+    config = {
+      init.defaultBranch = "main";
+    };
+  };
+
+  programs.tmux = {
+    enable = true;
   };
 
   programs.steam = {

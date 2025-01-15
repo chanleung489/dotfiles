@@ -5,8 +5,8 @@ stow polybar
 stow rofi
 stow alacritty
 stow nvim
-stow bash
-source ~/.bashrc
+stow zsh
+source ~/.zshrc
 stow tmux
 git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 tmux new-session -d -s test

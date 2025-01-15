@@ -36,8 +36,8 @@
         enable = true;
         extraPackages = with pkgs; [
           dmenu
-	i3status
-      	i3lock
+          i3status
+          i3lock
         ];
       };
     };
@@ -114,6 +114,8 @@
     ];
   };
 
+  users.defaultUserShell = pkgs.zsh;
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -152,6 +154,17 @@
 
   programs.tmux = {
     enable = true;
+  };
+
+  programs.zsh = {
+    enable = true;
+    autosuggestions.enable = true;
+    syntaxHighlighting.enable = true;
+
+    shellAliases = {
+      update = "sudo nixos-rebuild switch --flake ~/dotfiles/flakes";
+      xcc = "tr -d '\n' | xclip -selection clipboard";
+    };
   };
 
   programs.steam = {

@@ -30,6 +30,6 @@ eval "$(zoxide init bash)"
 
 eval "$(fzf --bash)"
 
-export TMUX_TMPDIR=~/.tmux/tmp
+export TMUX_TMPDIR=~/.config/tmux/tmp
 
 xrandr --output Virtual-1 --mode 1920x1080

@@ -1,10 +1,3 @@
-local function which_python()
-    local f = io.popen('env which python', 'r') or error("Fail to execute 'env which python'")
-    local s = f:read('*a') or error("Fail to read from io.popen result")
-    f:close()
-    return string.gsub(s, '%s+$', '')
-end
-
 return {
     {
         'williamboman/mason.nvim',
@@ -14,104 +7,102 @@ return {
 
     -- Autocompletion
     {
-        'hrsh7th/nvim-cmp',
-        event = 'InsertEnter',
-        dependencies = {
-            { 'L3MON4D3/LuaSnip' },
-            { 'rafamadriz/friendly-snippets' },
-            { 'saadparwaiz1/cmp_luasnip' },
-        },
-        config = function()
-            local cmp = require('cmp')
-            local cmp_select = { behaviour = 'select' }
-            require("luasnip.loaders.from_vscode").lazy_load()
+        {
+            'saghen/blink.cmp',
+            -- optional: provides snippets for the snippet source
+            dependencies = { 'rafamadriz/friendly-snippets' },
 
-            cmp.setup({
-                sources = cmp.config.sources({
-                    { name = 'nvim_lsp' },
-                    { name = 'nvim_lua' },
-                    { name = 'luasnip' },
-                    { name = 'path' },
-                }, {
-                    { name = 'buffer' },
-                }),
-                mapping = cmp.mapping.preset.insert({
-                    ['<C-b>'] = cmp.mapping.select_prev_item(cmp_select),
-                    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-                    ['<C-m>'] = cmp.mapping.confirm({ select = true }),
-                    ['<CR>'] = cmp.mapping.confirm({ select = true }),
-                    ['<C-Space>'] = cmp.mapping.complete(),
-                    -- ['<C-u>'] = cmp.mapping.scroll_docs(-4),
-                    -- ['<C-d>'] = cmp.mapping.scroll_docs(4),
-                }),
-                snippet = {
-                    expand = function(args)
-                        require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-                        -- vim.snippet.expand(args.body)
-                    end,
+            -- use a release tag to download pre-built binaries
+            version = '1.*',
+            -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+            -- build = 'cargo build --release',
+            -- If you use nix, you can build from source using latest nightly rust with:
+            -- build = 'nix run .#build-plugin',
+
+            ---@module 'blink.cmp'
+            ---@type blink.cmp.Config
+            opts = {
+                -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
+                -- 'super-tab' for mappings similar to vscode (tab to accept)
+                -- 'enter' for enter to accept
+                -- 'none' for no mappings
+                --
+                -- All presets have the following mappings:
+                -- C-space: Open menu or open docs if already open
+                -- C-n/C-p or Up/Down: Select next/previous item
+                -- C-e: Hide menu
+                -- C-k: Toggle signature help (if signature.enabled = true)
+                --
+                -- See :h blink-cmp-config-keymap for defining your own keymap
+                keymap = { preset = 'default' },
+
+                appearance = {
+                    -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+                    -- Adjusts spacing to ensure icons are aligned
+                    nerd_font_variant = 'mono'
                 },
-            })
-        end
+
+                -- (Default) Only show the documentation popup when manually triggered
+                completion = { documentation = { auto_show = false } },
+
+                -- Default list of enabled providers defined so that you can extend it
+                -- elsewhere in your config, without redefining it, due to `opts_extend`
+                sources = {
+                    default = { 'lsp', 'path', 'snippets', 'buffer' },
+                },
+
+                -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
+                -- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
+                -- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
+                --
+                -- See the fuzzy documentation for more information
+                fuzzy = { implementation = "prefer_rust_with_warning" }
+            },
+            opts_extend = { "sources.default" }
+        }
     },
 
     -- LSP
     {
         'neovim/nvim-lspconfig',
-        cmd = { 'LspInfo', 'LspInstall', 'LspStart' },
-        event = { 'BufReadPre', 'BufNewFile' },
-        dependencies = {
-            { 'hrsh7th/cmp-nvim-lsp' },
-            { 'williamboman/mason.nvim' },
-            { 'williamboman/mason-lspconfig.nvim' },
-        },
         config = function()
-            local lspconfig_defaults = require('lspconfig').util.default_config
-            lspconfig_defaults.capabilities = vim.tbl_deep_extend(
-                'force',
-                lspconfig_defaults.capabilities,
-                require('cmp_nvim_lsp').default_capabilities()
-            )
+            require 'lspconfig'.lua_ls.setup {
+                on_init = function(client)
+                    if client.workspace_folders then
+                        local path = client.workspace_folders[1].name
+                        if path ~= vim.fn.stdpath('config') and (vim.loop.fs_stat(path .. '/.luarc.json') or vim.loop.fs_stat(path .. '/.luarc.jsonc')) then
+                            return
+                        end
+                    end
 
-            local handlers = {
-                -- this first function is the "default handler"
-                -- it applies to every language server without a "custom handler"
-                function(server_name)
-                    require('lspconfig')[server_name].setup({})
-                end,
-                lua_ls = function()
-                    require('lspconfig').lua_ls.setup({
-                        settings = { Lua = { diagnostics = { globals = { 'vim' } } } }
+                    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+                        runtime = {
+                            -- Tell the language server which version of Lua you're using
+                            -- (most likely LuaJIT in the case of Neovim)
+                            version = 'LuaJIT'
+                        },
+                        -- Make the server aware of Neovim runtime files
+                        workspace = {
+                            checkThirdParty = false,
+                            library = {
+                                vim.env.VIMRUNTIME
+                                -- Depending on the usage, you might want to add additional paths here.
+                                -- "${3rd}/luv/library"
+                                -- "${3rd}/busted/library",
+                            }
+                            -- or pull in all of 'runtimepath'. NOTE: this is a lot slower and will cause issues when working on your own configuration (see https://github.com/neovim/nvim-lspconfig/issues/3189)
+                            -- library = vim.api.nvim_get_runtime_file("", true)
+                        }
                     })
                 end,
+                settings = {
+                    Lua = {}
+                }
             }
-            local python = which_python()
-            if python ~= "" then
-                handlers["pylsp"] = {
-                    function()
-                        require('lspconfig').pylsp.setup({
-                            settings = {
-                                pylsp = {
-                                    plugins = {
-                                        jedi = { environment = python },
-                                    }
-                                }
-                            }
-                        })
-                    end
-                }
-            end
-            require('mason-lspconfig').setup({
-                ensure_installed = {
-                    'lua_ls',
-                },
-                handlers = handlers
-            })
-
-            vim.diagnostic.config({
-                virtual_text = {
-                    prefix = '>', -- Could be '●', '▎', 'x'
-                }
-            })
+            require'lspconfig'.clangd.setup{}
+            require'lspconfig'.gopls.setup{}
+            require'lspconfig'.csharp_ls.setup{}
+            require'lspconfig'.pylsp.setup{}
         end
     }
 }

@@ -32,3 +32,5 @@ vim.opt.showtabline = 2
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
+
+vim.diagnostic.config({ virtual_lines = true })
